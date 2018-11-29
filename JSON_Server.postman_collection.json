@@ -1,0 +1,618 @@
+{
+	"info": {
+		"_postman_id": "1dfc8c89-edf9-4e3d-b5f6-ea92074f7ea6",
+		"name": "JSON Server",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/posts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Filter Test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1acefb6b-6825-48e8-a5ca-594cd1edc816",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\")",
+							"",
+							"var title = postman.getEnvironmentVariable(\"get-title\");",
+							"var author = postman.getEnvironmentVariable(\"get-author\")",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"tests[\"Id is correct for the get operation\"] = jsonData[0].id === \"1000\";",
+							"tests[\"Title is correct for the get operation\"] = jsonData[0].title === title;",
+							"tests[\"Author is correct for the get operation\"] = jsonData[0].author === author;",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/posts?author={{get-author}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts"
+					],
+					"query": [
+						{
+							"key": "author",
+							"value": "{{get-author}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "523cf8ef-153f-41a5-8acd-55b0f8c661bb",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 201;",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\")",
+							"",
+							"var id = postman.getEnvironmentVariable(\"post-id\");",
+							"var title = postman.getEnvironmentVariable(\"post-title\");",
+							"var author = postman.getEnvironmentVariable(\"post-author\")",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"tests[\"Id is correct for the post operation\"] = jsonData.id == id;",
+							"tests[\"Title is correct for the post operation\"] = jsonData.title === title;",
+							"tests[\"Author is correct for the post operation\"] = jsonData.author === author;",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "102fbef8-246c-418a-abb5-08cbdc4d929b",
+						"exec": [
+							"postman.setEnvironmentVariable(\"post-id\", 1+Number(postman.getEnvironmentVariable(\"post-id\")));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n        \"id\": \"{{post-id}}\",\n        \"title\": \"Wellington Testers\",\n        \"author\": \"Vikrant\"\n }"
+				},
+				"url": {
+					"raw": "http://localhost:3000/posts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Duplicate",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "523cf8ef-153f-41a5-8acd-55b0f8c661bb",
+						"exec": [
+							"tests[\"Status code is 500\"] = responseCode.code === 500;",
+							"",
+							"pm.test(\"Error message contains Insert failed, duplicate id\", function () ",
+							"{",
+							"    pm.expect(pm.response.text()).to.include(\"Insert failed, duplicate id\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "102fbef8-246c-418a-abb5-08cbdc4d929b",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n        \"id\": 1,\n        \"title\": \"Wellington Testers\",\n        \"author\": \"Vikrant\"\n }"
+				},
+				"url": {
+					"raw": "http://localhost:3000/posts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT With Full Data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "523cf8ef-153f-41a5-8acd-55b0f8c661bb",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\")",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"tests[\"Id is correct for the put operation\"] = jsonData.id == 1;",
+							"tests[\"Title is correct for the put operation\"] = jsonData.title === \"Wellington Testers\";",
+							"tests[\"Author is correct for the put operation\"] = jsonData.author === \"Vikrant Mulani\";",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "102fbef8-246c-418a-abb5-08cbdc4d929b",
+						"exec": [
+							"postman.setEnvironmentVariable(\"post-id\", 1+Number(postman.getEnvironmentVariable(\"post-id\")));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n        \"id\": 1,\n        \"title\": \"Wellington Testers\",\n        \"author\": \"Vikrant Mulani\"\n }"
+				},
+				"url": {
+					"raw": "http://localhost:3000/posts/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT With Partial Data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "523cf8ef-153f-41a5-8acd-55b0f8c661bb",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\")",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"tests[\"Id is correct for the put operation\"] = jsonData.id == 1;",
+							"tests[\"Title is correct for the put operation\"] = jsonData.title === undefined;",
+							"tests[\"Author is correct for the put operation\"] = jsonData.author === \"Vikrant Mulani, Wellington\";",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "102fbef8-246c-418a-abb5-08cbdc4d929b",
+						"exec": [
+							"postman.setEnvironmentVariable(\"post-id\", 1+Number(postman.getEnvironmentVariable(\"post-id\")));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n        \"author\": \"Vikrant Mulani, Wellington\"\n }"
+				},
+				"url": {
+					"raw": "http://localhost:3000/posts/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT With Full Data Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "523cf8ef-153f-41a5-8acd-55b0f8c661bb",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\")",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"tests[\"Id is correct for the put operation\"] = jsonData.id == 1;",
+							"tests[\"Title is correct for the put operation\"] = jsonData.title === \"Wellington Testers\";",
+							"tests[\"Author is correct for the put operation\"] = jsonData.author === \"Vikrant Mulani\";",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "102fbef8-246c-418a-abb5-08cbdc4d929b",
+						"exec": [
+							"postman.setEnvironmentVariable(\"post-id\", 1+Number(postman.getEnvironmentVariable(\"post-id\")));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n        \"id\": 1,\n        \"title\": \"Wellington Testers\",\n        \"author\": \"Vikrant Mulani\"\n }"
+				},
+				"url": {
+					"raw": "http://localhost:3000/posts/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH With Partial Data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "523cf8ef-153f-41a5-8acd-55b0f8c661bb",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\")",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"tests[\"Id is correct for the patch operation\"] = jsonData.id == 1;",
+							"tests[\"Title is correct for the patch operation\"] = jsonData.title === \"Wellington Testers\";",
+							"tests[\"Author is correct for the patch operation\"] = jsonData.author === \"Vikrant Mulani, QE\";",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "102fbef8-246c-418a-abb5-08cbdc4d929b",
+						"exec": [
+							"postman.setEnvironmentVariable(\"post-id\", 1+Number(postman.getEnvironmentVariable(\"post-id\")));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n        \"author\": \"Vikrant Mulani, QE\"\n }"
+				},
+				"url": {
+					"raw": "http://localhost:3000/posts/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST To DELETE",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "523cf8ef-153f-41a5-8acd-55b0f8c661bb",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 201;",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\")",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "102fbef8-246c-418a-abb5-08cbdc4d929b",
+						"exec": [
+							"postman.setEnvironmentVariable(\"post-id\", 1+Number(postman.getEnvironmentVariable(\"post-id\")));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n        \"id\": \"500\",\n        \"title\": \"Wellington Testers\",\n        \"author\": \"Vikrant\"\n }"
+				},
+				"url": {
+					"raw": "http://localhost:3000/posts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE First Time",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "523cf8ef-153f-41a5-8acd-55b0f8c661bb",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\")",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"tests[\"Id is correct for the patch operation\"] = jsonData.id === undefined;",
+							"tests[\"Title is correct for the patch operation\"] = jsonData.title === undefined;",
+							"tests[\"Author is correct for the patch operation\"] = jsonData.author === undefined;",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "102fbef8-246c-418a-abb5-08cbdc4d929b",
+						"exec": [
+							"postman.setEnvironmentVariable(\"post-id\", 1+Number(postman.getEnvironmentVariable(\"post-id\")));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/posts/500",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts",
+						"500"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE Second Time",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "523cf8ef-153f-41a5-8acd-55b0f8c661bb",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 404;",
+							"tests[\"Content-Type is present\"] = postman.getResponseHeader(\"Content-Type\")",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"tests[\"Id is correct for the patch operation\"] = jsonData.id === undefined;",
+							"tests[\"Title is correct for the patch operation\"] = jsonData.title === undefined;",
+							"tests[\"Author is correct for the patch operation\"] = jsonData.author === undefined;",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "102fbef8-246c-418a-abb5-08cbdc4d929b",
+						"exec": [
+							"postman.setEnvironmentVariable(\"post-id\", 1+Number(postman.getEnvironmentVariable(\"post-id\")));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/posts/500",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"posts",
+						"500"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
